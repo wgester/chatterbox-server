@@ -2,22 +2,23 @@
 var allRooms = {};
 var get = function(){
   $.ajax({
-      url: 'http://127.0.0.1:8080/1/classes/chatterbox',
+      url: 'http://127.0.0.1:8080/classes/messages',
       dataType: 'json',
       success: function(data){
-        console.log(data);
         $('#allMessages').text('');
-        for (var i = 0; i < data.results.length; i++){
-            var roomname = removeTags(data.results[i]['roomname']);
-            var username = removeTags(data.results[i]['username']);
-            var text = removeTags(data.results[i]['text']);
+        for (var i = 0; i < data.length; i++){
+            var roomname = removeTags(data[i]['roomname']);
+            var username = removeTags(data[i]['username']);
+            var text = removeTags(data[i]['text']);
             if(!(allRooms[roomname]) && roomname && (roomname !== 'main')){
                 $('#rooms').append('<button id='+ roomname +' class="room">' + roomname +'</button>'); 
                 allRooms[roomname] = roomname;  
             }
-            if(text.length <= 140){
-                $('#allMessages').append('<li class="user ' +username+'">' + '<b>' + username + '</b>' + ' ' + text + '</li>')
-            };
+            if (text){
+              if(text.length <= 140){
+                  $('#allMessages').append('<li class="user ' +username+'">' + '<b>' + username + '</b>' + ' ' + text + '</li>')
+              };
+            }
         };
       },
   });
@@ -25,15 +26,19 @@ var get = function(){
 
 //Refresh for chat rooms
 var getSpecific = function(){
+    if (message.roomname === 'home'){
+      get();
+      return;
+    }
     $.ajax({
-    url: 'http://127.0.0.1:8080/1/classes/chatterbox',
+    url: 'http://127.0.0.1:8080/classes/messages',
     dataType: 'json',
     success: function(data){
         $('#allMessages').text('');
-        for (var i = 0; i < data.results.length; i++){
-            var roomname = removeTags(data.results[i]['roomname']);
-            var username = removeTags(data.results[i]['username']);
-            var text = removeTags(data.results[i]['text']);
+        for (var i = 0; i < data.length; i++){
+            var roomname = removeTags(data[i]['roomname']);
+            var username = removeTags(data[i]['username']);
+            var text = removeTags(data[i]['text']);
             if (roomname === message.roomname){
                 if(!(allRooms[roomname]) && roomname && (roomname !== 'main')){
                     $('#rooms').append('<button id='+ roomname +' class="room">' + roomname +'</button>'); 
@@ -53,7 +58,7 @@ get();
 //Refresher
 $('#refreshing').on('click', function(){
   console.log('hello')
-  get();
+  getSpecific();
 });
 
 //Example message object
@@ -67,7 +72,7 @@ var message = {
 //Format for POST
 var post = function(){
     $.ajax({
-      url: 'http://127.0.0.1:8080/1/classes/chatterbox',
+      url: 'http://127.0.0.1:8080/classes/messages',
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',

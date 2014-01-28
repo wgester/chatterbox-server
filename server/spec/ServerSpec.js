@@ -90,6 +90,7 @@ describe("Node Server Request Listener Function", function() {
 
    handler.handleRequest(req, res);
    console.log("Res is " + res);
+   console.log(req);
 
    // Wait some time before checking results:
    waits(1000);

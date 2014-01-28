@@ -5,18 +5,13 @@
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 
-var message = {results: [{text: "hello Will, I am watching you", username: "Scotty", roomname: "4chan"}]};
+var message = {};
+
+
 
 exports.handleRequest = function(request, response) {
-  /* the 'request' argument comes from nodes http module. It includes info about the
-  request - such as what URL the browser is requesting. */
-
-  /* Documentation for both request and response can be found at
-   * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
 
   console.log("Serving request type " + request.method + " for url " + request.url + " request data: " + request);
-
-  
 
   // var messageResult = {results : message}
 
@@ -27,27 +22,47 @@ exports.handleRequest = function(request, response) {
   var headers = defaultCorsHeaders;
 
   request.on('data', function(data){
-    message.results.push(JSON.parse(data));
-    console.log(message);
+    if (data){  
+      if(message[request.url]){
+        message[request.url].push(JSON.parse(data));
+      } else {
+        message[request.url] = [JSON.parse(data)];
+      } 
+    }
   })
+  console.log(request.url)
 
   headers['Content-Type'] = "text/plain";
 
   /* .writeHead() tells our server what HTTP status code to send back */
-  response.writeHead(statusCode, headers);
+  
 
   /* Make sure to always call response.end() - Node will not send
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
   if(request.method === 'GET'){
-    response.end(JSON.stringify(message));
+    if (message[request.url]){
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(message[request.url]));
+    } else {
+      if(request.url.slice(0,30) === "http://127.0.0.1:8080/classes/"){
+        response.writeHead(statusCode, headers);
+        response.end(JSON.stringify([]));
+      } else {
+        response.writeHead(404, headers);
+        response.end(request.url);
+      }
+    }
   }
+  
   if(request.method === 'POST'){
-    response.end("h");
+    response.writeHead(201, headers);
+    response.end("");
   }
   if(request.method === 'OPTIONS'){
-    response.end("hello");
+    response.writeHead(statusCode, headers);
+    response.end("");
   }
 };
 
