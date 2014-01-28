@@ -2,9 +2,10 @@
 var allRooms = {};
 var get = function(){
   $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
-      data: {'order' : '-createdAt'},
+      url: 'http://127.0.0.1:8080/1/classes/chatterbox',
+      dataType: 'json',
       success: function(data){
+        console.log(data);
         $('#allMessages').text('');
         for (var i = 0; i < data.results.length; i++){
             var roomname = removeTags(data.results[i]['roomname']);
@@ -25,8 +26,8 @@ var get = function(){
 //Refresh for chat rooms
 var getSpecific = function(){
     $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox',
-    data: {'order' : '-createdAt'},
+    url: 'http://127.0.0.1:8080/1/classes/chatterbox',
+    dataType: 'json',
     success: function(data){
         $('#allMessages').text('');
         for (var i = 0; i < data.results.length; i++){
@@ -66,7 +67,7 @@ var message = {
 //Format for POST
 var post = function(){
     $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
+      url: 'http://127.0.0.1:8080/1/classes/chatterbox',
       type: 'POST',
       data: JSON.stringify(message),
       contentType: 'application/json',

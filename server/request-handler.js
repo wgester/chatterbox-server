@@ -5,6 +5,8 @@
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 
+var message = {results: [{text: "hello Will, I am watching you", username: "Scotty", roomname: "4chan"}]};
+
 exports.handleRequest = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
@@ -12,13 +14,22 @@ exports.handleRequest = function(request, response) {
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
 
-  console.log("Serving request type " + request.method + " for url " + request.url);
+  console.log("Serving request type " + request.method + " for url " + request.url + " request data: " + request);
+
+  
+
+  // var messageResult = {results : message}
 
   var statusCode = 200;
 
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
   var headers = defaultCorsHeaders;
+
+  request.on('data', function(data){
+    message.results.push(JSON.parse(data));
+    console.log(message);
+  })
 
   headers['Content-Type'] = "text/plain";
 
@@ -29,7 +40,15 @@ exports.handleRequest = function(request, response) {
    * anything back to the client until you do. The string you pass to
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
-  response.end("Hello, World!");
+  if(request.method === 'GET'){
+    response.end(JSON.stringify(message));
+  }
+  if(request.method === 'POST'){
+    response.end("h");
+  }
+  if(request.method === 'OPTIONS'){
+    response.end("hello");
+  }
 };
 
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
